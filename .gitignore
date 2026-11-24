@@ -15,3 +15,4 @@ frontend/dist/
 # Secrets and uploads
 .env
 uploads/
+k8s/01-secret.yaml

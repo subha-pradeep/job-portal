@@ -42,6 +42,7 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()                // signup, login
+                .requestMatchers("/actuator/health/**").permitAll()         // Docker/Kubernetes health checks
                 .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll() // anyone can browse jobs (step 3)
                 .anyRequest().authenticated())
             // Return 401 instead of redirecting to a login page

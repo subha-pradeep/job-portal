@@ -1,0 +1,82 @@
+# Disk for uploaded resume PDFs
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: resumes
+  namespace: jobportal
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: jobportal
+spec:
+  # 1 replica because resumes live on a ReadWriteOnce disk.
+  # To scale out, move resumes to object storage (e.g. AWS S3) first.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      securityContext:
+        fsGroup: 1001          # lets the non-root container write to the resumes disk
+      containers:
+        - name: backend
+          image: ghcr.io/subha-pradeep/job-portal-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_URL
+              value: jdbc:mysql://mysql:3306/jobportal
+            - name: DB_USER
+              value: jobportal
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: jobportal-secrets, key: DB_PASSWORD }
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef: { name: jobportal-secrets, key: JWT_SECRET }
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef: { name: jobportal-secrets, key: GEMINI_API_KEY }
+          # Kubernetes restarts the pod if liveness fails,
+          # and only sends traffic once readiness passes
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: 8080 }
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: 8080 }
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { memory: 1Gi }
+          volumeMounts:
+            - name: resumes
+              mountPath: /app/uploads
+      volumes:
+        - name: resumes
+          persistentVolumeClaim:
+            claimName: resumes
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend            # Nginx in the frontend pod calls http://backend:8080
+  namespace: jobportal
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 8080

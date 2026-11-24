@@ -2,9 +2,17 @@
 
 A full-stack job portal where recruiters post jobs and candidates apply with their resume. An LLM reads each resume and scores how well it matches the job description, so recruiters see the best-fit candidates first.
 
-**Tech stack:** Java 21 · Spring Boot 3 · Spring Security (JWT) · MySQL · React · Generative AI (LLM API) · Docker · Kubernetes
+**Tech stack:** Java 21 · Spring Boot 3 · Spring Security (JWT) · MySQL · React · Google Gemini (Generative AI) · Docker · Kubernetes · GitHub Actions
 
-> 🚧 Work in progress
+![CI](https://github.com/subha-pradeep/job-portal/actions/workflows/ci.yml/badge.svg)
+
+## Architecture
+
+```
+Browser ──► Nginx (React build) ──/api──► Spring Boot ──► MySQL
+                                              │
+                                              └──► Google Gemini (resume scoring)
+```
 
 ## Roadmap
 - [x] Project setup and database models
@@ -13,15 +21,48 @@ A full-stack job portal where recruiters post jobs and candidates apply with the
 - [x] Applying to jobs with resume upload
 - [x] AI resume screening (Google Gemini)
 - [x] React frontend
-- [ ] Docker and Kubernetes deployment
+- [x] Docker and Kubernetes deployment
+- [x] CI/CD with GitHub Actions
 
-## Run locally
+## Run with Docker (easiest)
 
-Requirements: Java 21, Maven, Docker
+Requirements: Docker Desktop
+
+```bash
+export GEMINI_API_KEY=your-key   # optional: enables AI screening
+docker compose up --build
+```
+
+Open http://localhost:3000. This starts three containers: MySQL, the Spring Boot backend and the React frontend served by Nginx.
+
+## Deploy to Kubernetes
+
+The `k8s/` folder has manifests for a namespace, MySQL (StatefulSet with a persistent volume), the backend (Deployment with liveness/readiness probes on Spring Boot Actuator) and the frontend (Deployment with 2 replicas behind a NodePort Service). Secrets come from a Kubernetes Secret, never from the repo.
+
+```bash
+cp k8s/examples/secret.example.yaml k8s/01-secret.yaml   # then fill in real values
+kubectl apply -f k8s/
+kubectl get pods -n jobportal
+```
+
+Open http://localhost:30080 (Docker Desktop Kubernetes) or run `minikube service frontend -n jobportal`.
+
+Images are pulled from GitHub Container Registry. After the first CI run, make both packages public under GitHub → Packages → package settings, or add an image pull secret.
+
+## CI/CD
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on every push:
+1. **Backend:** `mvn verify` on Java 21
+2. **Frontend:** `npm install` and `npm run build`
+3. **Docker (main branch only):** builds both images and pushes them to `ghcr.io`, tagged `latest` and with the commit SHA
+
+## Run locally without Docker (for development)
+
+Requirements: Java 21, Maven, Node.js 18+, Docker (for MySQL only)
 
 ```bash
 # 1. Start MySQL
-docker compose up -d
+docker compose up -d mysql
 
 # 2. Start the backend
 cd backend

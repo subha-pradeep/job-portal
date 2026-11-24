@@ -1,4 +1,13 @@
-# Starts a local MySQL database for development: docker compose up -d
+# Runs the whole app: MySQL + Spring Boot backend + React frontend (Nginx)
+#
+#   export GEMINI_API_KEY=your-key   # optional, enables AI screening
+#   docker compose up --build
+#
+# Then open http://localhost:3000
+#
+# For backend development only, start just the database:
+#   docker compose up -d mysql
+
 services:
   mysql:
     image: mysql:8.4
@@ -12,6 +21,37 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    container_name: jobportal-backend
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/jobportal
+      DB_USER: jobportal
+      DB_PASSWORD: jobportal
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      JWT_SECRET: ${JWT_SECRET:-mI38AICHusP+fo7MgwiDd7BDu53ZXxgRWtsNT7GnCEwzfXjOp3BXFkuGFuF3GHIR}
+    volumes:
+      - resumes:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy   # wait until MySQL is actually ready
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: jobportal-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
 
 volumes:
   mysql-data:
+  resumes:
