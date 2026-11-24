@@ -1,0 +1,17 @@
+# Java / Maven
+backend/target/
+*.class
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Node (frontend, step 6)
+node_modules/
+frontend/dist/
+
+# Secrets and uploads
+.env
+uploads/
