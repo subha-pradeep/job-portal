@@ -12,7 +12,7 @@ A full-stack job portal where recruiters post jobs and candidates apply with the
 - [x] Job posting and browsing APIs
 - [x] Applying to jobs with resume upload
 - [x] AI resume screening (Google Gemini)
-- [ ] React frontend
+- [x] React frontend
 - [ ] Docker and Kubernetes deployment
 
 ## Run locally
@@ -29,6 +29,20 @@ mvn spring-boot:run
 ```
 
 The API runs on http://localhost:8080.
+
+```bash
+# 3. Start the frontend (in a second terminal; needs Node.js 18+)
+cd frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5173. Sign up once as a recruiter to post a job, then in another browser (or a private window) sign up as a candidate and apply.
+
+## Features
+- **Candidates:** browse and search jobs, apply with a PDF resume, track application status and see the AI's feedback
+- **Recruiters:** post and close jobs, see applicants ranked by AI match score with matched/missing skills, view resumes, shortlist or reject
+- **Security:** JWT authentication, BCrypt password hashing, role-based access (`@PreAuthorize`), ownership checks
 
 ## How AI screening works
 
