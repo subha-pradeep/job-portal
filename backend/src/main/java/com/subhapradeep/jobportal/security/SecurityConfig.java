@@ -43,7 +43,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()                // signup, login
                 .requestMatchers("/actuator/health/**").permitAll()         // Docker/Kubernetes health checks
-                .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll() // anyone can browse jobs (step 3)
+                .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll() // anyone can browse jobs
                 .anyRequest().authenticated())
             // Return 401 instead of redirecting to a login page
             .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))

@@ -14,7 +14,7 @@ public record ApplicationResponse(
         Long candidateId,
         String candidateName,
         String candidateEmail,
-        Integer aiScore,        // filled in by the AI in step 5
+        Integer aiScore,        // filled in by the AI screening
         String aiFeedback,
         ApplicationStatus status,
         Instant appliedAt

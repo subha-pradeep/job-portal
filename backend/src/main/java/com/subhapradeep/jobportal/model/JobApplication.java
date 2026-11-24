@@ -28,15 +28,15 @@ public class JobApplication {
     @JoinColumn(name = "candidate_id")
     private User candidate;
 
-    // Where the uploaded PDF is stored (step 4)
+    // Where the uploaded PDF is stored
     private String resumePath;
 
-    // Text pulled out of the PDF, sent to the AI (step 5)
+    // Text pulled out of the PDF, sent to the AI
     @Lob
     @Column(columnDefinition = "TEXT")
     private String resumeText;
 
-    // AI results (step 5): 0-100 match score and a short explanation
+    // AI results: 0-100 match score and a short explanation
     private Integer aiScore;
 
     @Lob

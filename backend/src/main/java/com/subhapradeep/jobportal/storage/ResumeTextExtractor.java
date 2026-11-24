@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-/** Pulls plain text out of a PDF so the AI can read it in step 5. */
+/** Pulls plain text out of a PDF so the AI can read it. */
 @Component
 public class ResumeTextExtractor {
 

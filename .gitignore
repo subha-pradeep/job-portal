@@ -8,7 +8,7 @@ backend/target/
 *.iml
 .vscode/
 
-# Node (frontend, step 6)
+# Node (frontend)
 node_modules/
 frontend/dist/
 

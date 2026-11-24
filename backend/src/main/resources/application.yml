@@ -36,9 +36,9 @@ jwt:
   expiration-ms: ${JWT_EXPIRATION_MS:86400000}   # 24 hours
 
 app:
-  # React dev server (step 6) is allowed to call the API
+  # React dev server is allowed to call the API
   cors-allowed-origins: ${CORS_ORIGINS:http://localhost:5173}
-  # Folder where resume PDFs are saved (a Docker volume in step 7)
+  # Folder where resume PDFs are saved (a Docker volume in docker-compose and Kubernetes)
   upload-dir: ${UPLOAD_DIR:uploads}
 
 ai:
