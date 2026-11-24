@@ -56,6 +56,14 @@ public class ApplicationController {
         return applicationService.updateStatus(id, request.status(), recruiter);
     }
 
+    /** Re-run the AI screening for one application. */
+    @PostMapping("/api/recruiter/applications/{id}/screen")
+    @PreAuthorize("hasRole('RECRUITER')")
+    public ApplicationResponse rescreen(@PathVariable Long id,
+                                        @AuthenticationPrincipal User recruiter) {
+        return applicationService.rescreen(id, recruiter);
+    }
+
     /** Opens the candidate's resume PDF in the browser. */
     @GetMapping("/api/recruiter/applications/{id}/resume")
     @PreAuthorize("hasRole('RECRUITER')")

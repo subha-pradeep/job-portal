@@ -30,3 +30,11 @@ app:
   cors-allowed-origins: ${CORS_ORIGINS:http://localhost:5173}
   # Folder where resume PDFs are saved (a Docker volume in step 7)
   upload-dir: ${UPLOAD_DIR:uploads}
+
+ai:
+  gemini:
+    # Get a free key at https://aistudio.google.com/apikey and set GEMINI_API_KEY.
+    # Never commit the key. Without it, applications still work but aren't scored.
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-3.8-flash}
+    base-url: https://generativelanguage.googleapis.com/v1beta

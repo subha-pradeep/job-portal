@@ -1,5 +1,7 @@
 package com.subhapradeep.jobportal.application;
 
+import com.subhapradeep.jobportal.ai.ApplicationSubmittedEvent;
+import com.subhapradeep.jobportal.ai.ScreeningService;
 import com.subhapradeep.jobportal.common.ApiException;
 import com.subhapradeep.jobportal.model.ApplicationStatus;
 import com.subhapradeep.jobportal.model.Job;
@@ -10,6 +12,7 @@ import com.subhapradeep.jobportal.repository.JobRepository;
 import com.subhapradeep.jobportal.storage.ResumeStorageService;
 import com.subhapradeep.jobportal.storage.ResumeTextExtractor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,8 @@ public class ApplicationService {
     private final JobApplicationRepository applicationRepository;
     private final ResumeStorageService storageService;
     private final ResumeTextExtractor textExtractor;
+    private final ScreeningService screeningService;
+    private final ApplicationEventPublisher eventPublisher;
 
     // ---------- Candidate ----------
 
@@ -59,7 +64,8 @@ public class ApplicationService {
                 .build();
         applicationRepository.save(application);
 
-        // Step 5: the AI will score the resume here
+        // AI screening starts in the background once this transaction commits
+        eventPublisher.publishEvent(new ApplicationSubmittedEvent(application.getId()));
 
         return ApplicationResponse.from(application);
     }
@@ -91,6 +97,13 @@ public class ApplicationService {
         JobApplication application = findOwnedApplication(applicationId, recruiter);
         application.setStatus(status);
         return ApplicationResponse.from(application);
+    }
+
+    /** Run the AI again (e.g. it failed, or the key was added later). */
+    @Transactional
+    public ApplicationResponse rescreen(Long applicationId, User recruiter) {
+        JobApplication application = findOwnedApplication(applicationId, recruiter);
+        return ApplicationResponse.from(screeningService.screenNow(application));
     }
 
     @Transactional(readOnly = true)
