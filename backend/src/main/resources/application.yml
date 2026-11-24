@@ -14,3 +14,13 @@ spring:
 
 server:
   port: 8080
+
+jwt:
+  # Development-only default. In production set the JWT_SECRET environment variable
+  # (generate one with: openssl rand -base64 48)
+  secret: ${JWT_SECRET:mI38AICHusP+fo7MgwiDd7BDu53ZXxgRWtsNT7GnCEwzfXjOp3BXFkuGFuF3GHIR}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}   # 24 hours
+
+app:
+  # React dev server (step 6) is allowed to call the API
+  cors-allowed-origins: ${CORS_ORIGINS:http://localhost:5173}

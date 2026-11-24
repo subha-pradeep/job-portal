@@ -1,0 +1,18 @@
+package com.subhapradeep.jobportal.user;
+
+import com.subhapradeep.jobportal.model.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    /** Returns the logged-in user. Needs a valid JWT, otherwise 401. */
+    @GetMapping("/me")
+    public UserResponse me(@AuthenticationPrincipal User user) {
+        return UserResponse.from(user);
+    }
+}
