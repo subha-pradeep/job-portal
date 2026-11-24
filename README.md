@@ -10,7 +10,7 @@ A full-stack job portal where recruiters post jobs and candidates apply with the
 - [x] Project setup and database models
 - [x] Authentication (signup/login with JWT)
 - [x] Job posting and browsing APIs
-- [ ] Applying to jobs with resume upload
+- [x] Applying to jobs with resume upload
 - [ ] AI resume screening
 - [ ] React frontend
 - [ ] Docker and Kubernetes deployment
@@ -43,6 +43,11 @@ The API runs on http://localhost:8080.
 | PUT | `/api/jobs/{id}` | Recruiter (owner) | Edit a job |
 | PATCH | `/api/jobs/{id}/close` | Recruiter (owner) | Stop accepting applications |
 | GET | `/api/recruiter/jobs` | Recruiter | All jobs I posted |
+| POST | `/api/jobs/{id}/apply` | Candidate | Apply with a PDF resume (multipart field `resume`, max 5 MB) |
+| GET | `/api/candidate/applications` | Candidate | My applications and their status |
+| GET | `/api/recruiter/jobs/{id}/applications` | Recruiter (owner) | Applicants for a job, best AI score first |
+| PATCH | `/api/recruiter/applications/{id}/status` | Recruiter (owner) | `SHORTLISTED` or `REJECTED` |
+| GET | `/api/recruiter/applications/{id}/resume` | Recruiter (owner) | View the resume PDF |
 
 Send the token on protected requests as `Authorization: Bearer <token>`.
 
@@ -63,6 +68,11 @@ curl -X POST http://localhost:8080/api/jobs \
 
 # Browse jobs (no token needed)
 curl "http://localhost:8080/api/jobs?keyword=java"
+
+# Apply to job 1 with a resume (needs a CANDIDATE token)
+curl -X POST http://localhost:8080/api/jobs/1/apply \
+  -H "Authorization: Bearer <candidate-token>" \
+  -F "resume=@/path/to/resume.pdf"
 ```
 
 ## Database design

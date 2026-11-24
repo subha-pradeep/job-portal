@@ -11,6 +11,10 @@ spring:
       ddl-auto: update   # creates/updates tables from the entity classes
     show-sql: true
     open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 5MB      # largest resume we accept
+      max-request-size: 6MB
 
 server:
   port: 8080
@@ -24,3 +28,5 @@ jwt:
 app:
   # React dev server (step 6) is allowed to call the API
   cors-allowed-origins: ${CORS_ORIGINS:http://localhost:5173}
+  # Folder where resume PDFs are saved (a Docker volume in step 7)
+  upload-dir: ${UPLOAD_DIR:uploads}

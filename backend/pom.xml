@@ -61,6 +61,12 @@
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- Apache PDFBox: reads the text out of uploaded resume PDFs -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.3</version>
+        </dependency>
         <!-- MySQL driver -->
         <dependency>
             <groupId>com.mysql</groupId>
