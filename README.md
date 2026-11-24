@@ -9,7 +9,7 @@ A full-stack job portal where recruiters post jobs and candidates apply with the
 ## Roadmap
 - [x] Project setup and database models
 - [x] Authentication (signup/login with JWT)
-- [ ] Job posting and browsing APIs
+- [x] Job posting and browsing APIs
 - [ ] Applying to jobs with resume upload
 - [ ] AI resume screening
 - [ ] React frontend
@@ -37,6 +37,12 @@ The API runs on http://localhost:8080.
 | POST | `/api/auth/register` | Public | Sign up as `CANDIDATE` or `RECRUITER`, returns a JWT |
 | POST | `/api/auth/login` | Public | Log in, returns a JWT |
 | GET | `/api/users/me` | JWT | The logged-in user |
+| GET | `/api/jobs?keyword=java` | Public | Open jobs, newest first, optional title search |
+| GET | `/api/jobs/{id}` | Public | One job |
+| POST | `/api/jobs` | Recruiter | Post a job |
+| PUT | `/api/jobs/{id}` | Recruiter (owner) | Edit a job |
+| PATCH | `/api/jobs/{id}/close` | Recruiter (owner) | Stop accepting applications |
+| GET | `/api/recruiter/jobs` | Recruiter | All jobs I posted |
 
 Send the token on protected requests as `Authorization: Bearer <token>`.
 
@@ -48,6 +54,15 @@ curl -X POST http://localhost:8080/api/auth/register \
 
 # Who am I? (paste the token from the response above)
 curl http://localhost:8080/api/users/me -H "Authorization: Bearer <token>"
+
+# Post a job (needs a RECRUITER token)
+curl -X POST http://localhost:8080/api/jobs \
+  -H "Authorization: Bearer <recruiter-token>" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Java Backend Intern","company":"Acme","location":"Bhubaneswar","description":"Build REST APIs with Spring Boot and MySQL, write tests, and deploy with Docker.","requiredSkills":"Java, Spring Boot, MySQL, Docker"}'
+
+# Browse jobs (no token needed)
+curl "http://localhost:8080/api/jobs?keyword=java"
 ```
 
 ## Database design
